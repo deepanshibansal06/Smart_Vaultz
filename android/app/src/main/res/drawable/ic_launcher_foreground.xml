@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Traditional padlock: distinct shackle (U with curved top) + body (rounded rect), centered and sized -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Shackle: U-shape, wider arch, same stroke -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M44,48 L44,38 A10,10 0 0,1 64,38 L64,48 L62,48 L62,40 A8,8 0 0,0 46,40 L46,48 Z" />
+    <!-- Body: rounded rectangle, wider -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M42,48 L66,48 L66,68 Q66,71 63,71 L45,71 Q42,71 42,68 Z" />
+    <!-- Keyhole dot (matches icon background) -->
+    <path
+        android:fillColor="#0D1B2A"
+        android:pathData="M51,60 A3,3 0 1,1 57,60 A3,3 0 1,1 51,60 Z" />
+</vector>
