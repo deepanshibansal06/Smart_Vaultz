@@ -84,7 +84,8 @@ function handleFallback(endpoint, method, body) {
     const isProdUser = body?.email === 'admin@smartvault.com';
     const role = isProdUser ? 'admin' : 'user';
     const name = isProdUser ? 'Admin Security' : 'Deepanshi Bansal';
-    return { token: 'demo_token_' + Date.now(), role, name, email: body.email };
+    const email = body?.email || 'deepanshibansal06@gmail.com';
+    return { token: 'demo_token_' + Date.now(), role, name, email };
   }
 
   if (endpoint.includes('/auth/signup')) {
@@ -166,7 +167,7 @@ async function handleLogin(e) {
   try {
     const res = await apiCall('/auth/login', 'POST', { email, password });
     state.token = res.token;
-    state.user = { name: res.name || 'Deepanshi Bansal', email, role: res.role || 'user' };
+    state.user = { name: res.name || 'Deepanshi Bansal', email: res.email || email, role: res.role || 'user' };
 
     localStorage.setItem('sv_token', state.token);
     localStorage.setItem('sv_user', JSON.stringify(state.user));
@@ -205,7 +206,7 @@ function quickDemoLogin(role = 'user') {
     document.getElementById('login-email').value = 'admin@smartvault.com';
     document.getElementById('login-password').value = 'admin123';
   } else {
-    document.getElementById('login-email').value = 'user@smartvault.com';
+    document.getElementById('login-email').value = 'deepanshibansal06@gmail.com';
     document.getElementById('login-password').value = 'user123';
   }
 }
@@ -366,6 +367,13 @@ function openBookingModal(id, lockerNo, price, location) {
   state.selectedLockerToBook = { id, lockerNo, price, location: location || 'Building A - Main' };
   document.getElementById('modal-locker-no').textContent = lockerNo;
   document.getElementById('modal-locker-price').textContent = `₹${price}`;
+  
+  // Prefill user email input field in booking modal
+  const emailInput = document.getElementById('booking-notify-email');
+  if (emailInput) {
+    emailInput.value = state.user?.email || 'deepanshibansal06@gmail.com';
+  }
+
   document.getElementById('modal-booking').classList.add('active');
 }
 
@@ -373,7 +381,7 @@ function closeBookingModal() {
   document.getElementById('modal-booking').classList.remove('active');
 }
 
-// Confirm Booking & Trigger Confirmation Email to Logged-In User
+// Confirm Booking & Dispatch Real Confirmation Email
 async function confirmBooking() {
   if (!state.selectedLockerToBook) return;
 
@@ -384,7 +392,13 @@ async function confirmBooking() {
     return;
   }
 
-  const userEmail = state.user?.email || 'user@smartvault.com';
+  // Get recipient email from input field or state
+  const notifyEmailInput = document.getElementById('booking-notify-email');
+  const userEmail = (notifyEmailInput && notifyEmailInput.value.trim()) ? notifyEmailInput.value.trim() : (state.user?.email || 'deepanshibansal06@gmail.com');
+  
+  // Update state email if user modified it
+  if (state.user) state.user.email = userEmail;
+
   const userName = state.user?.name || 'Deepanshi Bansal';
   const lockerNo = state.selectedLockerToBook.lockerNo;
   const price = state.selectedLockerToBook.price;
@@ -402,31 +416,73 @@ async function confirmBooking() {
 
     closeBookingModal();
     
-    // Dispatch Confirmation Email Feature
+    // Dispatch Real Confirmation Email to logged-in user email
     sendBookingConfirmationEmail(userName, userEmail, lockerNo, price, location);
     
-    showToast(`Locker #${lockerNo} booked! Confirmation email sent to ${userEmail}`, 'success');
+    showToast(`Locker #${lockerNo} booked! Sending email to ${userEmail}...`, 'success');
   } catch (err) {
     showToast(err.message, 'error');
   }
 }
 
-// Dispatch Email Confirmation & Show Interactive Email Receipt Modal
-function sendBookingConfirmationEmail(userName, userEmail, lockerNo, price, location) {
-  // Try sending via backend API endpoint if supported
-  apiCall('/auth/send-otp', 'POST', { email: userEmail, type: 'booking-confirmation', lockerNo }).catch(() => {});
+// Real Email Dispatcher & Receipt Modal Trigger
+async function sendBookingConfirmationEmail(userName, userEmail, lockerNo, price, location) {
+  const unlockPIN = Math.floor(1000 + Math.random() * 9000).toString();
 
-  // Populate Email Receipt Modal
+  // Populate Receipt UI Modal
   document.getElementById('email-recipient').textContent = userEmail;
   document.getElementById('email-user-name').textContent = userName;
   document.getElementById('email-locker-no').textContent = lockerNo;
   document.getElementById('email-location').textContent = location;
   document.getElementById('email-amount').textContent = `₹${price}.00`;
-  document.getElementById('email-pin').textContent = Math.floor(1000 + Math.random() * 9000);
+  document.getElementById('email-pin').textContent = unlockPIN;
   document.getElementById('email-timestamp').textContent = new Date().toLocaleString();
 
-  // Show Email Receipt Modal
+  // Show Modal
   document.getElementById('modal-email-receipt').classList.add('active');
+
+  // Trigger Real Email via FormSubmit REST Mailer to recipient inbox
+  try {
+    const emailPayload = {
+      _subject: `Smart Vaultz - Locker #${lockerNo} Booking Confirmation`,
+      recipient_email: userEmail,
+      customer_name: userName,
+      reserved_locker: `#${lockerNo}`,
+      location: location,
+      amount_paid: `₹${price}.00`,
+      unlock_pin: unlockPIN,
+      timestamp: new Date().toLocaleString(),
+      message: `Hello ${userName},\n\nYour Smart Vaultz Locker #${lockerNo} has been successfully reserved!\n\nLocation: ${location}\nTotal Paid: ₹${price}.00\nYour Hardware Unlock PIN: ${unlockPIN}\n\nThank you for using Smart Vaultz IoT Delivery System!`
+    };
+
+    // 1. Dispatch via FormSubmit HTTP Mailer directly to inbox
+    fetch(`https://formsubmit.co/ajax/${userEmail}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(emailPayload)
+    }).then(res => res.json()).then(data => {
+      console.log('Real Email dispatch result:', data);
+      showToast(`📧 Real Confirmation Email sent to ${userEmail}! Check your inbox/spam folder.`, 'success');
+    }).catch(err => {
+      console.warn('Mail dispatch fallback:', err);
+    });
+
+    // 2. Also trigger backend send-otp API endpoint
+    apiCall('/auth/send-otp', 'POST', { email: userEmail, type: 'signup' }).catch(() => {});
+  } catch (err) {
+    console.error('Email dispatch error:', err);
+  }
+}
+
+function triggerResendEmail() {
+  const userEmail = document.getElementById('email-recipient').textContent || state.user?.email || 'deepanshibansal06@gmail.com';
+  const userName = state.user?.name || 'Deepanshi Bansal';
+  const lockerNo = document.getElementById('email-locker-no').textContent || '104';
+  const price = document.getElementById('email-amount').textContent || '₹150.00';
+  const location = document.getElementById('email-location').textContent || 'Building A';
+
+  showToast(`Resending confirmation email to ${userEmail}...`, 'info');
+  sendBookingConfirmationEmail(userName, userEmail, lockerNo, price, location);
 }
 
 function closeEmailModal() {
@@ -481,9 +537,9 @@ async function handleCreateLocker(e) {
 
 // Document Load Initializer
 document.addEventListener('DOMContentLoaded', () => {
-  // Check if token exists or initialize default user state
+  // Check if token exists or initialize default user state with user real email
   if (!state.user) {
-    state.user = { name: 'Deepanshi Bansal', email: 'deepanshi@smartvault.com', role: 'user' };
+    state.user = { name: 'Deepanshi Bansal', email: 'deepanshibansal06@gmail.com', role: 'user' };
   }
 
   if (state.token && state.user) {

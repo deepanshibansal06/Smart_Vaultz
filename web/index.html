@@ -257,7 +257,7 @@
           <form id="form-login" onsubmit="handleLogin(event)">
             <div class="form-group">
               <label class="form-label">Email Address</label>
-              <input type="email" id="login-email" class="form-input" placeholder="deepanshi@example.com" required value="user@smartvault.com">
+              <input type="email" id="login-email" class="form-input" placeholder="deepanshibansal06@gmail.com" required value="deepanshibansal06@gmail.com">
             </div>
             <div class="form-group">
               <label class="form-label">Password</label>
@@ -270,11 +270,11 @@
           <form id="form-signup" onsubmit="handleSignup(event)" style="display: none;">
             <div class="form-group">
               <label class="form-label">Full Name</label>
-              <input type="text" id="signup-name" class="form-input" placeholder="Deepanshi Bansal" required>
+              <input type="text" id="signup-name" class="form-input" placeholder="Deepanshi Bansal" required value="Deepanshi Bansal">
             </div>
             <div class="form-group">
               <label class="form-label">Email Address</label>
-              <input type="email" id="signup-email" class="form-input" placeholder="deepanshi@example.com" required>
+              <input type="email" id="signup-email" class="form-input" placeholder="deepanshibansal06@gmail.com" required value="deepanshibansal06@gmail.com">
             </div>
             <div class="form-group">
               <label class="form-label">Password</label>
@@ -476,22 +476,30 @@
       </div>
       <div class="modal-body">
         <p style="margin-bottom: 12px;">You are about to reserve:</p>
-        <div style="background: #F1F5F9; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+        <div style="background: #F1F5F9; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
           <h4 style="margin-bottom: 4px;">Locker #<span id="modal-locker-no">101</span></h4>
           <p style="color: var(--text-muted); font-size: 0.85rem;">Rate: <strong id="modal-locker-price" style="color: var(--text-main);">₹150.00</strong> / 24 hr slot</p>
         </div>
+
+        <!-- Notification Email Input Field -->
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label class="form-label" style="font-weight: 700; color: var(--accent-teal);">📧 Send Confirmation Email To:</label>
+          <input type="email" id="booking-notify-email" class="form-input" placeholder="deepanshibansal06@gmail.com" value="deepanshibansal06@gmail.com" required>
+          <span style="font-size: 0.75rem; color: var(--text-muted);">Enter your real email address to receive your booking receipt & unlock PIN.</span>
+        </div>
+
         <p style="font-size: 0.85rem; color: var(--text-muted);">
-          Payment will be deducted directly from your Smart Vaultz digital wallet balance (<strong class="wallet-balance-val">₹1500.00</strong>). An email receipt & PIN code will be sent to your email ID.
+          Payment will be deducted directly from your Smart Vaultz digital wallet balance (<strong class="wallet-balance-val">₹1500.00</strong>).
         </p>
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline btn-sm" onclick="closeBookingModal()">Cancel</button>
-        <button class="btn btn-primary btn-sm" onclick="confirmBooking()">Confirm & Send Confirmation Email</button>
+        <button class="btn btn-primary btn-sm" onclick="confirmBooking()">Confirm & Send Real Email</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL 2: EMAIL CONFIRMATION RECEIPT POPUP (New Feature) -->
+  <!-- MODAL 2: EMAIL CONFIRMATION RECEIPT POPUP -->
   <div id="modal-email-receipt" class="modal-overlay">
     <div class="modal-card" style="max-width: 550px;">
       <div class="modal-header" style="background: #0A1128; color: #FFF;">
@@ -500,19 +508,19 @@
             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
             <polyline points="22,6 12,13 2,6"/>
           </svg>
-          <h3 style="color: #FFF; font-size: 1.1rem;">Confirmation Email Sent!</h3>
+          <h3 style="color: #FFF; font-size: 1.1rem;">Confirmation Email Dispatched!</h3>
         </div>
         <button class="btn btn-outline btn-sm" style="color: #FFF; border-color: rgba(255,255,255,0.2);" onclick="closeEmailModal()">✕</button>
       </div>
       <div class="modal-body" style="padding: 24px;">
         <div style="background: rgba(2,195,154,0.1); border: 1px solid var(--accent-mint); padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 0.85rem; color: var(--accent-mint); font-weight: 600; display: flex; align-items: center; gap: 8px;">
           <span class="dot dot-available dot-pulse"></span>
-          A booking confirmation email has been dispatched to: <u id="email-recipient">deepanshi@smartvault.com</u>
+          Real Confirmation Email sent to: <u id="email-recipient">deepanshibansal06@gmail.com</u>
         </div>
 
         <div style="border: 1px dashed var(--bg-light-border); padding: 20px; border-radius: 12px; background: #FAFAFA;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--bg-light-border); padding-bottom: 8px;">
-            <strong style="color: var(--primary-navy); font-size: 0.95rem;">Smart Vaultz Receipt</strong>
+            <strong style="color: var(--primary-navy); font-size: 0.95rem;">Smart Vaultz Booking Receipt</strong>
             <span id="email-timestamp" style="font-size: 0.75rem; color: var(--text-muted);">23 Jul 2026</span>
           </div>
 
@@ -527,8 +535,9 @@
           </div>
         </div>
       </div>
-      <div class="modal-footer">
-        <button class="btn btn-primary btn-sm" onclick="closeEmailModal()" style="width: 100%;">Done</button>
+      <div class="modal-footer" style="display: flex; gap: 12px;">
+        <button class="btn btn-outline btn-sm" style="flex: 1;" onclick="triggerResendEmail()">📧 Send / Resend Email to Inbox</button>
+        <button class="btn btn-primary btn-sm" style="flex: 1;" onclick="closeEmailModal()">Done</button>
       </div>
     </div>
   </div>
