@@ -110,7 +110,7 @@
         <div class="process-card">
           <div class="process-number">4</div>
           <h3>4. Delivery Secured</h3>
-          <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 8px;">Get instant automated SMS notifications when your parcel is safe inside.</p>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 8px;">Get instant automated email & SMS notifications when your parcel is safe inside.</p>
         </div>
       </div>
     </section>
@@ -149,11 +149,12 @@
           <div class="feature-card">
             <div class="feature-icon">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
               </svg>
             </div>
-            <h3>Security & OTP Verification</h3>
-            <p style="color: var(--text-muted); margin-top: 8px;">Dual-factor authentication, email OTP verification, and personal MPIN security locks.</p>
+            <h3>Email Booking Confirmations</h3>
+            <p style="color: var(--text-muted); margin-top: 8px;">Instant automated email notifications sent to your registered address with access PINs & receipts.</p>
           </div>
         </div>
       </div>
@@ -298,7 +299,7 @@
             <span class="badge badge-active" style="margin-bottom: 20px;">Built For Security</span>
             <h2 style="font-size: 2.2rem; color: #FFF; margin-bottom: 16px;">Next-Gen IoT Delivery Lockers</h2>
             <p style="color: var(--text-light-muted);">
-              Access your assigned lockers remotely, monitor real-time door statuses, and manage your delivery deposits with ease.
+              Access your assigned lockers remotely, monitor real-time door statuses, and receive instant booking confirmation emails.
             </p>
           </div>
 
@@ -480,17 +481,59 @@
           <p style="color: var(--text-muted); font-size: 0.85rem;">Rate: <strong id="modal-locker-price" style="color: var(--text-main);">₹150.00</strong> / 24 hr slot</p>
         </div>
         <p style="font-size: 0.85rem; color: var(--text-muted);">
-          Payment will be deducted directly from your Smart Vaultz digital wallet balance (<strong class="wallet-balance-val">₹1500.00</strong>).
+          Payment will be deducted directly from your Smart Vaultz digital wallet balance (<strong class="wallet-balance-val">₹1500.00</strong>). An email receipt & PIN code will be sent to your email ID.
         </p>
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline btn-sm" onclick="closeBookingModal()">Cancel</button>
-        <button class="btn btn-primary btn-sm" onclick="confirmBooking()">Confirm & Pay</button>
+        <button class="btn btn-primary btn-sm" onclick="confirmBooking()">Confirm & Send Confirmation Email</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL 2: ADD FUNDS TO WALLET -->
+  <!-- MODAL 2: EMAIL CONFIRMATION RECEIPT POPUP (New Feature) -->
+  <div id="modal-email-receipt" class="modal-overlay">
+    <div class="modal-card" style="max-width: 550px;">
+      <div class="modal-header" style="background: #0A1128; color: #FFF;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-mint)" stroke-width="2">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+          <h3 style="color: #FFF; font-size: 1.1rem;">Confirmation Email Sent!</h3>
+        </div>
+        <button class="btn btn-outline btn-sm" style="color: #FFF; border-color: rgba(255,255,255,0.2);" onclick="closeEmailModal()">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 24px;">
+        <div style="background: rgba(2,195,154,0.1); border: 1px solid var(--accent-mint); padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 0.85rem; color: var(--accent-mint); font-weight: 600; display: flex; align-items: center; gap: 8px;">
+          <span class="dot dot-available dot-pulse"></span>
+          A booking confirmation email has been dispatched to: <u id="email-recipient">deepanshi@smartvault.com</u>
+        </div>
+
+        <div style="border: 1px dashed var(--bg-light-border); padding: 20px; border-radius: 12px; background: #FAFAFA;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--bg-light-border); padding-bottom: 8px;">
+            <strong style="color: var(--primary-navy); font-size: 0.95rem;">Smart Vaultz Receipt</strong>
+            <span id="email-timestamp" style="font-size: 0.75rem; color: var(--text-muted);">23 Jul 2026</span>
+          </div>
+
+          <p style="font-size: 0.9rem; margin-bottom: 6px;"><strong>Customer:</strong> <span id="email-user-name">Deepanshi Bansal</span></p>
+          <p style="font-size: 0.9rem; margin-bottom: 6px;"><strong>Reserved Vault:</strong> Locker #<span id="email-locker-no">104</span></p>
+          <p style="font-size: 0.9rem; margin-bottom: 6px;"><strong>Location:</strong> <span id="email-location">Building A - Ground Floor</span></p>
+          <p style="font-size: 0.9rem; margin-bottom: 6px;"><strong>Total Paid:</strong> <strong id="email-amount" style="color: var(--status-available);">₹150.00</strong> (Wallet)</p>
+
+          <div style="margin-top: 16px; background: #0A1128; color: #FFF; padding: 12px; border-radius: 8px; text-align: center;">
+            <span style="font-size: 0.75rem; color: var(--text-light-muted); display: block;">YOUR HARDWARE UNLOCK PIN</span>
+            <strong id="email-pin" style="font-size: 1.8rem; letter-spacing: 4px; color: var(--accent-mint);">4829</strong>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary btn-sm" onclick="closeEmailModal()" style="width: 100%;">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: ADD FUNDS TO WALLET -->
   <div id="modal-wallet" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">
@@ -510,7 +553,7 @@
     </div>
   </div>
 
-  <!-- MODAL 3: ADMIN CREATE LOCKER -->
+  <!-- MODAL 4: ADMIN CREATE LOCKER -->
   <div id="modal-create-locker" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">

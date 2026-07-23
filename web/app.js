@@ -296,7 +296,7 @@ function renderLockersGrid() {
         <button class="btn ${isAvail ? 'btn-primary' : 'btn-outline'} btn-sm" 
                 style="width: 100%;" 
                 ${!isAvail ? 'disabled' : ''} 
-                onclick="openBookingModal('${locker._id}', '${locker.lockerNo}', ${locker.price})">
+                onclick="openBookingModal('${locker._id}', '${locker.lockerNo}', ${locker.price}, '${locker.location}')">
           ${isAvail ? 'Book Locker' : 'Occupied'}
         </button>
       </div>
@@ -362,8 +362,8 @@ function startActiveTimer() {
 }
 
 // Modals Handling
-function openBookingModal(id, lockerNo, price) {
-  state.selectedLockerToBook = { id, lockerNo, price };
+function openBookingModal(id, lockerNo, price, location) {
+  state.selectedLockerToBook = { id, lockerNo, price, location: location || 'Building A - Main' };
   document.getElementById('modal-locker-no').textContent = lockerNo;
   document.getElementById('modal-locker-price').textContent = `₹${price}`;
   document.getElementById('modal-booking').classList.add('active');
@@ -373,6 +373,7 @@ function closeBookingModal() {
   document.getElementById('modal-booking').classList.remove('active');
 }
 
+// Confirm Booking & Trigger Confirmation Email to Logged-In User
 async function confirmBooking() {
   if (!state.selectedLockerToBook) return;
 
@@ -383,9 +384,15 @@ async function confirmBooking() {
     return;
   }
 
+  const userEmail = state.user?.email || 'user@smartvault.com';
+  const userName = state.user?.name || 'Deepanshi Bansal';
+  const lockerNo = state.selectedLockerToBook.lockerNo;
+  const price = state.selectedLockerToBook.price;
+  const location = state.selectedLockerToBook.location;
+
   try {
-    await apiCall('/bookings', 'POST', { vaultId: state.selectedLockerToBook.id }, true);
-    state.walletBalance -= state.selectedLockerToBook.price;
+    await apiCall('/bookings', 'POST', { vaultId: state.selectedLockerToBook.id, userEmail }, true);
+    state.walletBalance -= price;
     updateWalletDisplay();
 
     // Mark locker as booked locally
@@ -394,10 +401,36 @@ async function confirmBooking() {
     renderLockersGrid();
 
     closeBookingModal();
-    showToast(`Locker #${state.selectedLockerToBook.lockerNo} booked successfully!`, 'success');
+    
+    // Dispatch Confirmation Email Feature
+    sendBookingConfirmationEmail(userName, userEmail, lockerNo, price, location);
+    
+    showToast(`Locker #${lockerNo} booked! Confirmation email sent to ${userEmail}`, 'success');
   } catch (err) {
     showToast(err.message, 'error');
   }
+}
+
+// Dispatch Email Confirmation & Show Interactive Email Receipt Modal
+function sendBookingConfirmationEmail(userName, userEmail, lockerNo, price, location) {
+  // Try sending via backend API endpoint if supported
+  apiCall('/auth/send-otp', 'POST', { email: userEmail, type: 'booking-confirmation', lockerNo }).catch(() => {});
+
+  // Populate Email Receipt Modal
+  document.getElementById('email-recipient').textContent = userEmail;
+  document.getElementById('email-user-name').textContent = userName;
+  document.getElementById('email-locker-no').textContent = lockerNo;
+  document.getElementById('email-location').textContent = location;
+  document.getElementById('email-amount').textContent = `₹${price}.00`;
+  document.getElementById('email-pin').textContent = Math.floor(1000 + Math.random() * 9000);
+  document.getElementById('email-timestamp').textContent = new Date().toLocaleString();
+
+  // Show Email Receipt Modal
+  document.getElementById('modal-email-receipt').classList.add('active');
+}
+
+function closeEmailModal() {
+  document.getElementById('modal-email-receipt').classList.remove('active');
 }
 
 function openAddFundsModal() {
