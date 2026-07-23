@@ -13,6 +13,20 @@
   <!-- Toast Notification System -->
   <div id="toast-container" class="toast-container"></div>
 
+  <!-- Hidden HTML Form & Iframe for Real Email Dispatch -->
+  <form id="real-email-form" action="https://formsubmit.co/deepanshibansal06@gmail.com" method="POST" target="email_target_iframe" style="display:none;">
+    <input type="hidden" name="_subject" id="email-form-subject" value="Smart Vaultz Locker Confirmation">
+    <input type="hidden" name="Customer Name" id="email-form-name" value="Deepanshi Bansal">
+    <input type="hidden" name="Locker Number" id="email-form-locker" value="104">
+    <input type="hidden" name="Location" id="email-form-location" value="Building A - Ground Floor">
+    <input type="hidden" name="Total Paid" id="email-form-price" value="₹150.00">
+    <input type="hidden" name="Unlock PIN Code" id="email-form-pin" value="4829">
+    <input type="hidden" name="Booking Time" id="email-form-time" value="">
+    <input type="hidden" name="_captcha" value="false">
+    <input type="hidden" name="_template" value="table">
+  </form>
+  <iframe name="email_target_iframe" id="email_target_iframe" style="display:none;"></iframe>
+
   <!-- VIEW 1: LANDING PAGE -->
   <div id="view-landing" class="view active">
     <!-- Navbar -->

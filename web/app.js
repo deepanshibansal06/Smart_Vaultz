@@ -1,13 +1,13 @@
 /**
  * Smart Vaultz Web Client Application
- * Optimized for Sub-Millisecond Zero-Latency Performance & Instant UI Responsiveness
+ * Optimized for Sub-Millisecond Zero-Latency Performance & Real Email Delivery
  */
 
-// Configuration & Ultra-Fast Timeout
+// Configuration & API Base URL
 const CONFIG = {
   API_BASE_URL: 'https://smart-vault-backend.onrender.com/api',
   LOCAL_API_URL: 'http://localhost:5000/api',
-  TIMEOUT_MS: 1200 // Max 1.2s network timeout to prevent UI lag
+  TIMEOUT_MS: 1200
 };
 
 // Application State
@@ -19,7 +19,7 @@ const state = {
   myBookings: [],
   walletBalance: 1500.00,
   activeBookingTimer: null,
-  timerSeconds: 2700, // 45:00 minutes default countdown
+  timerSeconds: 2700,
   selectedLockerToBook: null
 };
 
@@ -43,7 +43,7 @@ const MOCK_DATA = {
   wallet: 1500.00
 };
 
-// Non-blocking Ultra-Fast API Helper
+// Fast API Helper
 async function apiCall(endpoint, method = 'GET', body = null, requireAuth = false) {
   const headers = { 'Content-Type': 'application/json' };
   if (requireAuth && state.token) {
@@ -71,7 +71,7 @@ async function apiCall(endpoint, method = 'GET', body = null, requireAuth = fals
   }
 }
 
-// Instant Fallback Data Provider (0ms Latency)
+// Fallback Provider
 function handleFallback(endpoint, method, body) {
   if (endpoint.includes('/auth/login')) {
     const isProdUser = body?.email === 'admin@smartvault.com';
@@ -86,7 +86,7 @@ function handleFallback(endpoint, method, body) {
   return { success: true };
 }
 
-// Instant View Switching (0ms UI Latency)
+// View Manager
 function switchView(viewName) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   const targetView = document.getElementById(`view-${viewName}`);
@@ -100,7 +100,7 @@ function switchView(viewName) {
   }
 }
 
-// Instant Toast Notifications
+// Toast System
 function showToast(message, type = 'info') {
   const container = document.getElementById('toast-container');
   if (!container) return;
@@ -122,7 +122,7 @@ function showToast(message, type = 'info') {
   }, 3000);
 }
 
-// Auth Handlers (Instant Login Response)
+// Auth Handlers
 function handleLogin(e) {
   e.preventDefault();
   const email = document.getElementById('login-email').value || 'deepanshibansal06@gmail.com';
@@ -135,8 +135,6 @@ function handleLogin(e) {
   showToast(`Welcome back, ${state.user.name}!`, 'success');
   updateUserHeader();
   switchView('dashboard');
-
-  // Background non-blocking network sync
   apiCall('/auth/login', 'POST', { email }).catch(() => {});
 }
 
@@ -172,7 +170,7 @@ function handleLogout() {
   switchView('landing');
 }
 
-// Instant User Header Update
+// Sync User Name
 function updateUserHeader() {
   const sidebarNameEl = document.getElementById('user-display-name');
   const greetingNameEl = document.getElementById('dash-user-greeting');
@@ -182,19 +180,17 @@ function updateUserHeader() {
   if (greetingNameEl) greetingNameEl.textContent = userName;
 }
 
-// Fast Dashboard Loading
+// Dashboard Initializer
 function loadDashboardData() {
   updateUserHeader();
   startActiveTimer();
 
-  // Instant render from memory
   if (state.lockers.length === 0) {
     state.lockers = MOCK_DATA.lockers;
   }
   renderLockersGrid();
   updateWalletDisplay();
 
-  // Background async sync (non-blocking)
   apiCall('/vaults').then(vaults => {
     if (vaults && Array.isArray(vaults) && vaults.length > 0) {
       state.lockers = vaults;
@@ -203,7 +199,7 @@ function loadDashboardData() {
   }).catch(() => {});
 }
 
-// Instant Wallet Display
+// Wallet Display
 function updateWalletDisplay() {
   const walletEls = document.querySelectorAll('.wallet-balance-val');
   walletEls.forEach(el => {
@@ -211,7 +207,7 @@ function updateWalletDisplay() {
   });
 }
 
-// Fast Locker Cards Render
+// Render Locker Cards
 function renderLockersGrid() {
   const container = document.getElementById('lockers-grid');
   if (!container) return;
@@ -248,12 +244,11 @@ function renderLockersGrid() {
   }).join('');
 }
 
-// Sub-Second Remote Hardware Lock/Unlock Control
+// Hardware Actions
 function triggerLockAction(action) {
   const statusBadge = document.getElementById('banner-lock-status');
   const bookingId = MOCK_DATA.myBooking._id;
 
-  // Instant UI feedback (0ms delay)
   if (action === 'open') {
     showToast('🔓 ESP32 Servo Triggered: Locker #104 UNLOCKED!', 'success');
     if (statusBadge) {
@@ -268,12 +263,11 @@ function triggerLockAction(action) {
     }
   }
 
-  // Non-blocking network trigger
   const endpoint = action === 'open' ? `/bookings/open/${bookingId}` : `/bookings/close/${bookingId}`;
   apiCall(endpoint, 'POST', {}, true).catch(() => {});
 }
 
-// Fast Ticking Timer
+// Active Booking Timer
 function startActiveTimer() {
   if (state.activeBookingTimer) clearInterval(state.activeBookingTimer);
   const timerEl = document.getElementById('active-countdown');
@@ -292,7 +286,7 @@ function startActiveTimer() {
   }, 1000);
 }
 
-// Instant Modals Handling
+// Booking Modals
 function openBookingModal(id, lockerNo, price, location) {
   state.selectedLockerToBook = { id, lockerNo, price, location: location || 'Building A - Main' };
   document.getElementById('modal-locker-no').textContent = lockerNo;
@@ -310,7 +304,7 @@ function closeBookingModal() {
   document.getElementById('modal-booking').classList.remove('active');
 }
 
-// Instant Booking Confirmation & Real Email Dispatch
+// Confirm Booking & Trigger Real Email Sending
 function confirmBooking() {
   if (!state.selectedLockerToBook) return;
 
@@ -330,7 +324,7 @@ function confirmBooking() {
   const price = state.selectedLockerToBook.price;
   const location = state.selectedLockerToBook.location;
 
-  // 1. Instant local state & wallet deduction
+  // 1. Deduct balance & update UI
   state.walletBalance -= price;
   updateWalletDisplay();
 
@@ -340,27 +334,29 @@ function confirmBooking() {
 
   closeBookingModal();
   
-  // 2. Trigger Real Email Delivery
+  // 2. Dispatch Real Email to userEmail
   sendBookingConfirmationEmail(userName, userEmail, lockerNo, price, location);
-  showToast(`Locker #${lockerNo} booked! Sending real email to ${userEmail}`, 'success');
+  showToast(`Locker #${lockerNo} booked! Sending real email to ${userEmail}...`, 'success');
 
-  // 3. Non-blocking API sync
+  // 3. Async backend sync
   apiCall('/bookings', 'POST', { vaultId: state.selectedLockerToBook.id, userEmail }, true).catch(() => {});
 }
 
-// Real Email Dispatcher to User Email Inbox
+// Real Email Dispatcher via Hidden HTML Form & Mailto Fallback
 function sendBookingConfirmationEmail(userName, userEmail, lockerNo, price, location) {
   const unlockPIN = Math.floor(1000 + Math.random() * 9000).toString();
+  const timestamp = new Date().toLocaleString();
 
+  // Populate Receipt UI Modal
   document.getElementById('email-recipient').textContent = userEmail;
   document.getElementById('email-user-name').textContent = userName;
   document.getElementById('email-locker-no').textContent = lockerNo;
   document.getElementById('email-location').textContent = location;
   document.getElementById('email-amount').textContent = `₹${price}.00`;
   document.getElementById('email-pin').textContent = unlockPIN;
-  document.getElementById('email-timestamp').textContent = new Date().toLocaleString();
+  document.getElementById('email-timestamp').textContent = timestamp;
 
-  // Set up mailto link for direct mail app dispatch option
+  // Setup mailto button for direct 1-click mail client launch
   const mailtoBtn = document.getElementById('email-mailto-btn');
   if (mailtoBtn) {
     const subject = encodeURIComponent(`Smart Vaultz - Locker #${lockerNo} Booking Confirmation`);
@@ -369,40 +365,35 @@ function sendBookingConfirmationEmail(userName, userEmail, lockerNo, price, loca
       `Your Smart Vaultz Locker #${lockerNo} has been successfully reserved!\n\n` +
       `Locker Number: #${lockerNo}\n` +
       `Location: ${location}\n` +
-      `Total Paid: ₹${price}.00 (via Wallet)\n` +
-      `Hardware Access PIN: ${unlockPIN}\n` +
-      `Booking Time: ${new Date().toLocaleString()}\n\n` +
+      `Total Paid: ₹${price}.00 (via Smart Vaultz Wallet)\n` +
+      `Hardware Access PIN Code: ${unlockPIN}\n` +
+      `Booking Time: ${timestamp}\n\n` +
       `Thank you for using Smart Vaultz IoT Delivery System!`
     );
     mailtoBtn.href = `mailto:${userEmail}?subject=${subject}&body=${body}`;
   }
 
+  // Populate and submit hidden FormSubmit HTML form to bypass CORS and deliver real email straight to inbox
+  const form = document.getElementById('real-email-form');
+  if (form) {
+    form.action = `https://formsubmit.co/${userEmail}`;
+    document.getElementById('email-form-subject').value = `Smart Vaultz - Locker #${lockerNo} Confirmation`;
+    document.getElementById('email-form-name').value = userName;
+    document.getElementById('email-form-locker').value = `#${lockerNo}`;
+    document.getElementById('email-form-location').value = location;
+    document.getElementById('email-form-price').value = `₹${price}.00`;
+    document.getElementById('email-form-pin').value = unlockPIN;
+    document.getElementById('email-form-time').value = timestamp;
+
+    try {
+      form.submit();
+      console.log('Real Email Form submitted to:', userEmail);
+    } catch (err) {
+      console.warn('Form submit error:', err);
+    }
+  }
+
   document.getElementById('modal-email-receipt').classList.add('active');
-
-  // Multi-provider Real Email Sending (FormSubmit & Web3Forms)
-  const emailPayload = {
-    _subject: `Smart Vaultz - Locker #${lockerNo} Booking Confirmation`,
-    recipient_email: userEmail,
-    customer_name: userName,
-    reserved_locker: `#${lockerNo}`,
-    location: location,
-    amount_paid: `₹${price}.00`,
-    unlock_pin: unlockPIN,
-    timestamp: new Date().toLocaleString(),
-    message: `Hello ${userName},\n\nYour Smart Vaultz Locker #${lockerNo} has been successfully reserved!\n\nLocation: ${location}\nTotal Paid: ₹${price}.00\nYour Hardware Unlock PIN: ${unlockPIN}\n\nThank you for using Smart Vaultz IoT Delivery System!`
-  };
-
-  // Provider 1: FormSubmit
-  fetch(`https://formsubmit.co/ajax/${userEmail}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-    body: JSON.stringify(emailPayload)
-  }).then(res => res.json()).then(() => {
-    showToast(`📧 Real Email sent to ${userEmail}!`, 'success');
-  }).catch(() => {});
-
-  // Provider 2: Backend send-otp endpoint
-  apiCall('/auth/send-otp', 'POST', { email: userEmail, type: 'signup' }).catch(() => {});
 }
 
 function triggerResendEmail() {
