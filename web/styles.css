@@ -788,6 +788,112 @@ a:hover {
   margin-bottom: 12px;
 }
 
+/* AI-Based Locker Allocation Component */
+.ai-allocation-card {
+  background: linear-gradient(135deg, #0A1128 0%, #101F42 100%);
+  border: 1px solid rgba(2, 195, 154, 0.35);
+  border-radius: var(--border-radius-lg);
+  padding: 24px 28px;
+  margin-bottom: 32px;
+  box-shadow: 0 10px 30px rgba(2, 195, 154, 0.12);
+  color: #FFFFFF;
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-allocation-card::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(2, 195, 154, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.ai-card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(90deg, #02C39A 0%, #00B4D8 100%);
+  color: #0A1128;
+  font-weight: 800;
+  font-size: 0.75rem;
+  padding: 4px 12px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.ai-controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+  margin-bottom: 20px;
+}
+
+.ai-control-group label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-light-muted);
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.ai-select-btn-group {
+  display: flex;
+  gap: 6px;
+}
+
+.ai-chip-btn {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #E2E8F0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.ai-chip-btn:hover {
+  background: rgba(2, 195, 154, 0.15);
+  border-color: var(--accent-mint);
+}
+
+.ai-chip-btn.active {
+  background: var(--accent-mint);
+  color: #0A1128;
+  border-color: var(--accent-mint);
+  font-weight: 700;
+  box-shadow: 0 0 10px rgba(2, 195, 154, 0.4);
+}
+
+.ai-result-panel {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px dashed rgba(2, 195, 154, 0.4);
+  border-radius: 12px;
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.ai-match-score {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--accent-mint);
+}
+
+
 .banner-title {
   font-size: 2rem;
   color: #FFFFFF;

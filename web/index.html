@@ -15,15 +15,20 @@
 
   <!-- Hidden HTML Form & Iframe for Real Email Dispatch -->
   <form id="real-email-form" action="https://formsubmit.co/deepanshibansal06@gmail.com" method="POST" target="email_target_iframe" style="display:none;">
-    <input type="hidden" name="_subject" id="email-form-subject" value="Smart Vaultz Locker Confirmation">
-    <input type="hidden" name="Customer Name" id="email-form-name" value="Deepanshi Bansal">
-    <input type="hidden" name="Locker Number" id="email-form-locker" value="104">
+    <input type="hidden" name="_sendername" value="SmartVaultz">
+    <input type="hidden" name="_subject" id="email-form-subject" value="SmartVaultz - Thank You for Your Locker Booking!">
+    <input type="hidden" name="_autoresponse" id="email-form-autoresponse" value="Thank you for booking with SmartVaultz! Your locker reservation is confirmed.">
+    <input type="hidden" name="Thank You Message" id="email-form-thankyou" value="Thank you for booking with SmartVaultz! Your locker reservation has been successfully confirmed.">
+    <input type="hidden" name="Booking Status" value="CONFIRMED - Thank you for booking with SmartVaultz!">
+    <input type="hidden" name="Customer" id="email-form-name" value="Deepanshi Bansal">
+    <input type="hidden" name="Locker" id="email-form-locker" value="104">
     <input type="hidden" name="Location" id="email-form-location" value="Building A - Ground Floor">
     <input type="hidden" name="Total Paid" id="email-form-price" value="₹150.00">
-    <input type="hidden" name="Unlock PIN Code" id="email-form-pin" value="4829">
+    <input type="hidden" name="Access PIN" id="email-form-pin" value="4829">
     <input type="hidden" name="Booking Time" id="email-form-time" value="">
+    <input type="hidden" name="Booking Duration" id="email-form-duration" value="45 Minutes">
     <input type="hidden" name="_captcha" value="false">
-    <input type="hidden" name="_template" value="table">
+    <input type="hidden" name="_template" value="basic">
   </form>
   <iframe name="email_target_iframe" id="email_target_iframe" style="display:none;"></iframe>
 
@@ -446,6 +451,9 @@
           <div class="remote-control-panel">
             <div style="font-size: 0.8rem; color: var(--text-light-muted); margin-bottom: 4px; font-weight: 600;">REMAINING TIME</div>
             <div id="active-countdown" class="timer-display">45:00</div>
+            <button class="btn btn-outline btn-sm" style="margin-bottom: 12px; font-size: 0.75rem; color: var(--accent-mint); border-color: rgba(2,195,154,0.4);" onclick="testExpiryReminderEmail()">
+              ⏰ Test 5-Min Expiry Alert
+            </button>
             <div class="remote-buttons">
               <button id="btn-remote-unlock" class="btn btn-primary" onclick="triggerLockAction('open')">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
@@ -456,6 +464,56 @@
                 🔒 LOCK DOOR
               </button>
             </div>
+          </div>
+        </div>
+
+        <!-- AI-BASED LOCKER ALLOCATION SYSTEM (RESEARCH OPTIMIZATION ENGINE) -->
+        <div class="ai-allocation-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="ai-card-badge">⭐ AI Allocation Engine</span>
+              <h3 style="color: #FFF; font-size: 1.15rem; margin: 0;">Smart AI Locker Allocation System</h3>
+            </div>
+            <span style="font-size: 0.75rem; color: var(--accent-mint); font-weight: 600;">Size • Weight • Proximity Research Optimization</span>
+          </div>
+
+          <p style="color: var(--text-light-muted); font-size: 0.85rem; margin-bottom: 16px;">
+            Smart assignment matrix: <strong>Small parcels → Small lockers</strong>, <strong>Heavy parcels → Ground level lockers</strong>, and <strong>Priority deliveries → Closest entrance lockers</strong>.
+          </p>
+
+          <div class="ai-controls-grid">
+            <!-- 1. Parcel Size -->
+            <div class="ai-control-group">
+              <label>📦 PARCEL SIZE</label>
+              <div class="ai-select-btn-group" id="ai-size-group">
+                <button type="button" class="ai-chip-btn active" onclick="setAIOption('size', 'small')">Small</button>
+                <button type="button" class="ai-chip-btn" onclick="setAIOption('size', 'medium')">Medium</button>
+                <button type="button" class="ai-chip-btn" onclick="setAIOption('size', 'large')">Large</button>
+              </div>
+            </div>
+
+            <!-- 2. Parcel Weight -->
+            <div class="ai-control-group">
+              <label>🏋️ PARCEL WEIGHT</label>
+              <div class="ai-select-btn-group" id="ai-weight-group">
+                <button type="button" class="ai-chip-btn active" onclick="setAIOption('weight', 'light')">Light (&lt;5kg)</button>
+                <button type="button" class="ai-chip-btn" onclick="setAIOption('weight', 'heavy')">Heavy (≥5kg)</button>
+              </div>
+            </div>
+
+            <!-- 3. Delivery Priority -->
+            <div class="ai-control-group">
+              <label>⚡ DELIVERY PRIORITY</label>
+              <div class="ai-select-btn-group" id="ai-priority-group">
+                <button type="button" class="ai-chip-btn active" onclick="setAIOption('priority', 'standard')">Standard</button>
+                <button type="button" class="ai-chip-btn" onclick="setAIOption('priority', 'express')">Priority Express</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live AI Allocation Result Panel -->
+          <div id="ai-recommendation-panel" class="ai-result-panel">
+            <!-- Rendered dynamically by app.js -->
           </div>
         </div>
 

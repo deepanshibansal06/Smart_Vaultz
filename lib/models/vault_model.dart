@@ -6,6 +6,9 @@ class VaultModel {
   final String slotDate;
   final String timeSlot;
   final String status; // 'available' | 'booked'
+  final String size; // 'small' | 'medium' | 'large'
+  final String level; // 'lower' | 'upper'
+  final String proximity; // 'closest' | 'standard'
 
   VaultModel({
     required this.id,
@@ -15,5 +18,8 @@ class VaultModel {
     this.slotDate = '',
     required this.timeSlot,
     this.status = 'available',
+    this.size = 'small',
+    this.level = 'lower',
+    this.proximity = 'closest',
   });
 }
