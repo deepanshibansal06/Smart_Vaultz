@@ -483,7 +483,7 @@
 
         <!-- Notification Email Input Field -->
         <div class="form-group" style="margin-bottom: 16px;">
-          <label class="form-label" style="font-weight: 700; color: var(--accent-teal);">📧 Send Confirmation Email To:</label>
+          <label class="form-label" style="font-weight: 700; color: var(--accent-teal);">📧 Send Real Confirmation Email To:</label>
           <input type="email" id="booking-notify-email" class="form-input" placeholder="deepanshibansal06@gmail.com" value="deepanshibansal06@gmail.com" required>
           <span style="font-size: 0.75rem; color: var(--text-muted);">Enter your real email address to receive your booking receipt & unlock PIN.</span>
         </div>
@@ -535,8 +535,9 @@
           </div>
         </div>
       </div>
-      <div class="modal-footer" style="display: flex; gap: 12px;">
-        <button class="btn btn-outline btn-sm" style="flex: 1;" onclick="triggerResendEmail()">📧 Send / Resend Email to Inbox</button>
+      <div class="modal-footer" style="display: flex; gap: 8px;">
+        <a id="email-mailto-btn" target="_blank" class="btn btn-secondary btn-sm" style="flex: 1; text-align: center;">✉️ Open in My Mail App</a>
+        <button class="btn btn-outline btn-sm" style="flex: 1;" onclick="triggerResendEmail()">🔄 Resend Email</button>
         <button class="btn btn-primary btn-sm" style="flex: 1;" onclick="closeEmailModal()">Done</button>
       </div>
     </div>
