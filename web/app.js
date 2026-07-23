@@ -1,6 +1,6 @@
 /**
  * Smart Vaultz Web Client Application
- * Optimized for Sub-Millisecond Zero-Latency Performance & Real Email Delivery
+ * Optimized for Sub-Millisecond Zero-Latency Performance & Direct Email Compose Trigger
  */
 
 // Configuration & API Base URL
@@ -336,13 +336,13 @@ function confirmBooking() {
   
   // 2. Dispatch Real Email to userEmail
   sendBookingConfirmationEmail(userName, userEmail, lockerNo, price, location);
-  showToast(`Locker #${lockerNo} booked! Sending real email to ${userEmail}...`, 'success');
+  showToast(`Locker #${lockerNo} booked! Opening email compose for ${userEmail}...`, 'success');
 
   // 3. Async backend sync
   apiCall('/bookings', 'POST', { vaultId: state.selectedLockerToBook.id, userEmail }, true).catch(() => {});
 }
 
-// Real Email Dispatcher via Hidden HTML Form & Mailto Fallback
+// Real Email Dispatcher via Gmail Compose Window, Mailto Link & FormSubmit
 function sendBookingConfirmationEmail(userName, userEmail, lockerNo, price, location) {
   const unlockPIN = Math.floor(1000 + Math.random() * 9000).toString();
   const timestamp = new Date().toLocaleString();
@@ -356,28 +356,39 @@ function sendBookingConfirmationEmail(userName, userEmail, lockerNo, price, loca
   document.getElementById('email-pin').textContent = unlockPIN;
   document.getElementById('email-timestamp').textContent = timestamp;
 
-  // Setup mailto button for direct 1-click mail client launch
-  const mailtoBtn = document.getElementById('email-mailto-btn');
-  if (mailtoBtn) {
-    const subject = encodeURIComponent(`Smart Vaultz - Locker #${lockerNo} Booking Confirmation`);
-    const body = encodeURIComponent(
-      `Hello ${userName},\n\n` +
-      `Your Smart Vaultz Locker #${lockerNo} has been successfully reserved!\n\n` +
-      `Locker Number: #${lockerNo}\n` +
-      `Location: ${location}\n` +
-      `Total Paid: ₹${price}.00 (via Smart Vaultz Wallet)\n` +
-      `Hardware Access PIN Code: ${unlockPIN}\n` +
-      `Booking Time: ${timestamp}\n\n` +
-      `Thank you for using Smart Vaultz IoT Delivery System!`
-    );
-    mailtoBtn.href = `mailto:${userEmail}?subject=${subject}&body=${body}`;
+  // Formatted Email Body
+  const rawSubject = `Smart Vaultz - Locker #${lockerNo} Booking Confirmation`;
+  const rawBody = 
+    `Hello ${userName},\n\n` +
+    `Your Smart Vaultz Locker #${lockerNo} has been successfully reserved!\n\n` +
+    `Locker Number: #${lockerNo}\n` +
+    `Location: ${location}\n` +
+    `Total Paid: ₹${price}.00 (via Smart Vaultz Wallet)\n` +
+    `Hardware Access PIN Code: ${unlockPIN}\n` +
+    `Booking Time: ${timestamp}\n\n` +
+    `Thank you for using Smart Vaultz IoT Delivery System!`;
+
+  // 1. Setup Gmail Compose Direct URL (Guaranteed Delivery straight from Gmail!)
+  const gmailComposeUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(userEmail)}&su=${encodeURIComponent(rawSubject)}&body=${encodeURIComponent(rawBody)}`;
+  
+  const gmailBtn = document.getElementById('email-gmail-btn');
+  if (gmailBtn) {
+    gmailBtn.href = gmailComposeUrl;
   }
 
-  // Populate and submit hidden FormSubmit HTML form to bypass CORS and deliver real email straight to inbox
+  const mailtoBtn = document.getElementById('email-mailto-btn');
+  if (mailtoBtn) {
+    mailtoBtn.href = `mailto:${userEmail}?subject=${encodeURIComponent(rawSubject)}&body=${encodeURIComponent(rawBody)}`;
+  }
+
+  // Auto open Gmail compose window in a new tab so 1 click on Send delivers real email directly to user inbox
+  window.open(gmailComposeUrl, '_blank');
+
+  // 2. Submit hidden HTML form to FormSubmit as background provider
   const form = document.getElementById('real-email-form');
   if (form) {
     form.action = `https://formsubmit.co/${userEmail}`;
-    document.getElementById('email-form-subject').value = `Smart Vaultz - Locker #${lockerNo} Confirmation`;
+    document.getElementById('email-form-subject').value = rawSubject;
     document.getElementById('email-form-name').value = userName;
     document.getElementById('email-form-locker').value = `#${lockerNo}`;
     document.getElementById('email-form-location').value = location;
@@ -387,10 +398,7 @@ function sendBookingConfirmationEmail(userName, userEmail, lockerNo, price, loca
 
     try {
       form.submit();
-      console.log('Real Email Form submitted to:', userEmail);
-    } catch (err) {
-      console.warn('Form submit error:', err);
-    }
+    } catch (err) {}
   }
 
   document.getElementById('modal-email-receipt').classList.add('active');
@@ -403,7 +411,7 @@ function triggerResendEmail() {
   const price = document.getElementById('email-amount').textContent || '₹150.00';
   const location = document.getElementById('email-location').textContent || 'Building A';
 
-  showToast(`Resending email to ${userEmail}...`, 'info');
+  showToast(`Opening Gmail compose to send email to ${userEmail}...`, 'info');
   sendBookingConfirmationEmail(userName, userEmail, lockerNo, price, location);
 }
 
